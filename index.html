@@ -319,20 +319,19 @@ footer {
     <h3 class="zh-only">📋 命盤資訊（示範結果）</h3>
     <h3 class="en-only">📋 Chart Info (Demo)</h3>
     <div class="result-grid">
-      <div class="result-item"><span class="label"><span class="zh-only">農曆</span><span class="en-only">Lunar</span></span><span class="value">丁巳年 三月初一</span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">八字</span><span class="en-only">Pillars</span></span><span class="value accent">丁巳 甲辰 辛亥 戊戌</span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">五行局</span><span class="en-only">Bureau</span></span><span class="value gold"><span class="zh-only">土五局（納音沙中土）</span><span class="en-only">Earth-5</span></span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">命宮</span><span class="en-only">Life</span></span><span class="value">午（天同、貪狼、祿存、文曲）</span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">身宮</span><span class="en-only">Body</span></span><span class="value">寅（紫微、左輔）</span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">大限</span><span class="en-only">Da Xian</span></span><span class="value">46-50<span class="zh-only">歲</span><span class="en-only">yr</span>（<span class="zh-only">卯宮</span><span class="en-only">Mao</span>）</span></div>
-      <div class="result-item"><span class="label"><span class="zh-only">流年</span><span class="en-only">Annual</span></span><span class="value">丙午<span class="zh-only">年 · 命宮申（武曲、天相）</span><span class="en-only"> · Life Palace Shen</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">農曆</span><span class="en-only">Lunar</span></span><span id="demoLunar" class="value">丁巳年 三月初一</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">八字</span><span class="en-only">Pillars</span></span><span id="demoPillars" class="value accent">丁巳 甲辰 辛亥 戊戌</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">五行局</span><span class="en-only">Bureau</span></span><span id="demoBureau" class="value gold"><span class="zh-only">土五局（納音沙中土）</span><span class="en-only">Earth-5 Bureau</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">命宮</span><span class="en-only">Life Palace</span></span><span id="demoLife"><span class="zh-only">午（天同、貪狼、祿存、文曲）</span><span class="en-only">Wu (Tian Tong, Tan Lang, Lu Cun, Wen Qu)</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">身宮</span><span class="en-only">Body Palace</span></span><span id="demoBody"><span class="zh-only">寅（紫微、左輔）</span><span class="en-only">Yin (Zi Wei, Zuo Fu)</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">大限</span><span class="en-only">Da Xian</span></span><span id="demoDaxian"><span class="zh-only">46-50歲（卯宮）</span><span class="en-only">46-50 yr (Mao)</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">流年</span><span class="en-only">Annual</span></span><span id="demoAnnual"><span class="zh-only">丙午年 · 命宮申（武曲、天相）</span><span class="en-only">Bing Wu · Shen (Wu Qu, Tian Xiang)</span></span></div>
     </div>
   </div>
   <div class="result-card">
     <h3 class="zh-only">🔮 性格簡評</h3>
-    <h3 class="en-only">🔮 Personality</h3>
-    <p style="color:var(--text-dim);line-height:1.8;" class="zh-only">命宮在午宮，主星：天同、貪狼。天同化權 + 貪狼，天生親和力強，善於交際應酬。藝術天賦高，在美學或娛樂領域有出色表現。能化解衝突、凝聚團隊。但需留意慾望控制。</p>
-    <p style="color:var(--text-dim);line-height:1.8;" class="en-only">Life Palace in Wu. Main stars: Tian Tong, Tan Lang. Natural charisma, artistic talent, excellent negotiator. Watch for scattered focus.</p>
+    <h3 class="en-only">🔮 Personality Summary</h3>
+    <p id="demoPersonality" style="color:var(--text-dim);line-height:1.8;"><span class="zh-only">命宮在午宮，主星：天同、貪狼。天同化權 + 貪狼，天生親和力強，善於交際應酬。藝術天賦高，在美學或娛樂領域有出色表現。能化解衝突、凝聚團隊。但需留意慾望控制。</span><span class="en-only">Life Palace Wu. Main stars: Tian Tong (Romance) &amp; Tan Lang (Wolf). Natural charisma, artistic flair, excellent at networking. Combines peacemaking with creative ambition. Watch for scattered focus.</span></p>
   </div>
 
   <div class="cta-section">
@@ -406,6 +405,99 @@ switchLang = function(l) { origSwitch(l); renderSample(); };
 
 function handleDemo(e) {
   e.preventDefault();
+  const y = document.getElementById('demoYear').value || '1977';
+  const m = document.getElementById('demoMonth').value || '4';
+  const d = document.getElementById('demoDay').value || '18';
+  const h = document.getElementById('demoHour').value || '19';
+  const min = document.getElementById('demoMinute').value || '30';
+  const gender = document.getElementById('demoGender').value;
+
+  // Simulate dynamic demo output based on inputs
+  const yearNum = parseInt(y);
+  const hourNum = parseInt(h);
+  const isNewYear = m >= 2 || (m == 1 && d >= 20);
+  const zodiacIndex = isNewYear ? (yearNum % 12) : ((yearNum - 1) % 12);
+  const zodiac = ['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
+  const zodiacEn = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'];
+  const zi = zodiac[zodiacIndex];
+  const ziEn = zodiacEn[zodiacIndex];
+
+  // Map branch index to character
+  const branchIdx = Math.floor(hourNum / 2) % 12;
+  const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const branchesEn = ['Zi','Chou','Yin','Mao','Chen','Si','Wu','Wei','Shen','You','Xu','Hai'];
+
+  // Heavenly stems for year
+  const stemIdx = isNewYear ? ((yearNum - 4) % 10) : ((yearNum - 5) % 10);
+  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const stemsEn = ['Jia','Yi','Bing','Ding','Wu','Ji','Geng','Xin','Ren','Gui'];
+  const yearStem = stems[((stemIdx % 10) + 10) % 10];
+  const yearStemEn = stemsEn[((stemIdx % 10) + 10) % 10];
+
+  // Sample life palace positions (simplified demo mapping)
+  const lifeIdx = (10 - (((yearNum - 1900) * 12 + (m - 1) + d) % 12) + ((branchIdx + 1) % 12)) % 12;
+  const mainStars = [
+    ['紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁','巨門','廟旺'],
+    ['天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁','巨門'],
+    ['太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁'],
+    ['廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相'],
+    ['天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府'],
+    ['武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺'],
+    ['太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍'],
+    ['天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機'],
+    ['巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同'],
+    ['紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽'],
+    ['天相','紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲'],
+    ['天同','天相','紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微']
+  ];
+
+  const bodyPalaces = ['財帛','疾厄','遷移','交友','官祿','田宅','福德','父母','命宮','兄弟','夫妻','子女'];
+  const bodyEn = ['Wealth','Health','Travel','Friends','Career','Property','Fortune','Parents','Life','Siblings','Marriage','Children'];
+  // Simple mapping: body is 4 ahead of life
+  const bodyIdx = (lifeIdx + 4) % 12;
+
+  const life = branches[lifeIdx];
+  const lifeEn = branchesEn[lifeIdx];
+  const body = branches[bodyIdx];
+  const bodyEnName = branchesEn[bodyIdx];
+
+  // Determine stars for life palace
+  const starRow = lifeIdx < mainStars.length ? mainStars[lifeIdx] : mainStars[0];
+  const starCol = (yearNum + h) % starRow.length;
+  const lifeStars = starRow[starCol];
+
+  // Bureau (simplified)
+  const bureauOptions = ['水二局','木三局','金四局','土五局','火六局'];
+  const bureauOptionsEn = ['Water-2','Wood-3','Metal-4','Earth-5','Fire-6'];
+  const bureauIdx = (yearNum + m) % 5;
+
+  // Personality
+  const personalities = [
+    '命宮主星活潑，天生具有領導力和創造力。善於交際，能在團隊中發揮影響力。需留意情緒管理，避免過於急躁。',
+    '天同化權在命宮，親和力強，善於化解衝突。藝術天賦高，在美學或娛樂領域有出色表現。需注意把握機會。',
+    '命宮紫微坐守，氣質沉穩，天生領袖格局。有全局觀和決斷力，適合管理職位。注意不要過於剛愎自用。',
+    '貪狼在命宮，才華洋溢，學習能力強，人脈廣闊。在社交娛樂領域容易有成就。需留意慾望管理。',
+    '天機在命宮，思維敏捷，善於策劃和分析。適合策略規劃、教育或諮詢行業。注意避免想太多而行動不足。'
+  ];
+  const personalitiesEn = [
+    'Active Life Palace stars. Natural leadership and creativity. Good communicator. Watch for impulsive decisions.',
+    'Tian Tong in Life Palace. Great charisma, peacemaker. Artistic talent. Needs to seize opportunities.',
+    'Zi Wei in Life Palace. Calm, authoritative. Born leader with strategic vision. Avoid being stubborn.',
+    'Tan Lang in Life Palace. Talented, fast learner, wide network. Excels in social/creative fields. Manage desires.',
+    'Tian Ji in Life Palace. Sharp mind, excellent planner. Suits strategy, education, or consulting. Avoid overthinking.'
+  ];
+  const pIdx = (yearNum + m + d) % personalities.length;
+
+  // Update results
+  document.getElementById('demoLunar').textContent = yearStem + zi + '年 ' + m + '月' + d + '日';
+  document.getElementById('demoPillars').textContent = yearStem + '巳 甲辰 辛亥 戊戌';
+  document.getElementById('demoBureau').innerHTML = '<span class="zh-only">' + bureauOptions[bureauIdx] + '（納音' + bureauOptions[bureauIdx].substring(0,1) + '）</span><span class="en-only">' + bureauOptionsEn[bureauIdx] + '</span>';
+  document.getElementById('demoLife').innerHTML = '<span class="zh-only">' + life + '（' + lifeStars + '）</span><span class="en-only">' + lifeEn + ' (' + lifeStars + ')</span>';
+  document.getElementById('demoBody').innerHTML = '<span class="zh-only">' + body + '（' + bodyPalaces[bodyIdx] + '）</span><span class="en-only">' + bodyEnName + ' (' + bodyEn[bodyIdx] + ')</span>';
+  document.getElementById('demoDaxian').innerHTML = '<span class="zh-only">' + (yearNum - 30) + '-' + (yearNum - 25) + '歲（' + branches[(lifeIdx + 5) % 12] + '宮）</span><span class="en-only">' + (yearNum - 30) + '-' + (yearNum - 25) + ' yr (' + branchesEn[(lifeIdx + 5) % 12] + ')</span>';
+  document.getElementById('demoAnnual').innerHTML = '<span class="zh-only">丙午年 · 命宮' + branches[(lifeIdx + 4) % 12] + '（' + mainStars[(lifeIdx + 4) % 12][starCol] + '）</span><span class="en-only">Bing Wu · ' + branchesEn[(lifeIdx + 4) % 12] + ' (' + mainStars[(lifeIdx + 4) % 12][starCol] + ')</span>';
+  document.getElementById('demoPersonality').innerHTML = '<span class="zh-only">' + personalities[pIdx] + '</span><span class="en-only">' + personalitiesEn[pIdx] + '</span>';
+
   document.getElementById('resultSection').classList.add('visible');
   document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
   return false;
