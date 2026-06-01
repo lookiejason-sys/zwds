@@ -1,0 +1,5 @@
+node_modules/
+api/
+scripts/
+vercel.json
+package.json
