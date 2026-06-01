@@ -596,7 +596,9 @@ function handleDemo(e) {
   document.getElementById('demoBureau').innerHTML = '<span class="zh-only">' + bureauOptions[bureauIdx] + '（納音' + bureauOptions[bureauIdx].substring(0,1) + '）</span><span class="en-only">' + bureauOptionsEn[bureauIdx] + '</span>';
   document.getElementById('demoLife').innerHTML = '<span class="zh-only">' + life + '（' + lifeStars + '）</span><span class="en-only">' + lifeEn + ' (' + lifeStars + ')</span>';
   document.getElementById('demoBody').innerHTML = '<span class="zh-only">' + body + '（' + bodyPalaces[bodyIdx] + '）</span><span class="en-only">' + bodyEnName + ' (' + bodyEn[bodyIdx] + ')</span>';
-  document.getElementById('demoDaxian').innerHTML = '<span class="zh-only">' + (yearNum - 30) + '-' + (yearNum - 25) + '歲（' + branches[(lifeIdx + 5) % 12] + '宮）</span><span class="en-only">' + (yearNum - 30) + '-' + (yearNum - 25) + ' yr (' + branchesEn[(lifeIdx + 5) % 12] + ')</span>';
+  const daxianAgeStart = 4 + (lifeIdx * 4); // simplified: each palace roughly 4 years
+  const daxianAgeEnd = daxianAgeStart + 3;
+  document.getElementById('demoDaxian').innerHTML = '<span class="zh-only">' + daxianAgeStart + '-' + daxianAgeEnd + '歲（' + branches[(lifeIdx + 5) % 12] + '宮）</span><span class="en-only">Age ' + daxianAgeStart + '-' + daxianAgeEnd + ' (' + branchesEn[(lifeIdx + 5) % 12] + ')</span>';
   document.getElementById('demoAnnual').innerHTML = '<span class="zh-only">丙午年 · 命宮' + branches[(lifeIdx + 4) % 12] + '（' + mainStars[(lifeIdx + 4) % 12][starCol] + '）</span><span class="en-only">Bing Wu · ' + branchesEn[(lifeIdx + 4) % 12] + ' (' + mainStars[(lifeIdx + 4) % 12][starCol] + ')</span>';
   document.getElementById('demoPersonality').innerHTML = '<span class="zh-only">' + personalities[pIdx] + '</span><span class="en-only">' + personalitiesEn[pIdx] + '</span>';
 
