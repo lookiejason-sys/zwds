@@ -371,8 +371,9 @@ footer {
 <!-- Demo Result -->
 <section class="result-section container" id="resultSection">
   <div class="result-card">
-    <h3 class="zh-only">📋 命盤資訊（示範結果）</h3>
-    <h3 class="en-only">📋 Chart Info (Demo)</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+      <h3 style="margin:0;padding:0;border:none;font-size:1rem;"><span id="demoChartLabel"><span class="zh-only">📋 命盤資訊（示範結果）</span><span class="en-only">📋 Chart Info (Demo)</span></span></h3>
+    </div>
     <div class="result-grid">
       <div class="result-item"><span class="label"><span class="zh-only">農曆</span><span class="en-only">Lunar</span></span><span id="demoLunar" class="value">丁巳年 三月初一</span></div>
       <div class="result-item"><span class="label"><span class="zh-only">八字</span><span class="en-only">Pillars</span></span><span id="demoPillars" class="value accent">丁巳 甲辰 辛亥 戊戌</span></div>
@@ -505,105 +506,53 @@ function loadSample() {
   document.getElementById('demoGender').value = 'female';
 }
 
-function handleDemo(e) {
-  e.preventDefault();
-  const y = document.getElementById('demoYear').value || '1977';
-  const m = document.getElementById('demoMonth').value || '4';
-  const d = document.getElementById('demoDay').value || '18';
-  const h = document.getElementById('demoHour').value || '19';
-  const min = document.getElementById('demoMinute').value || '30';
-  const gender = document.getElementById('demoGender').value;
+// Pre-computed real chart data for DEMO samples only
+const DEMO_CHARTS = {
+  '1977-4-18-19-male': { labelZh:'丁巳年三月初一 戌時 · 男', labelEn:'Ding Si Yr, 3rd Mo, 1st Day, Xu Hour · Male', lunarZh:'丁巳年 三月初一', lunarEn:'Ding Si, 3rd Mo, 1st Day', pillarsZh:'丁巳 甲辰 辛亥 戊戌', pillarsEn:'Ding Si Jia Chen Xin Hai Wu Xu', bureauZh:'土五局（納音沙中土）', bureauEn:'Earth-5 Bureau (Sands Earth)', lifeZh:'午（天同、貪狼、祿存、文曲）', lifeEn:'Wu (Tian Tong, Tan Lang, Lu Cun, Wen Qu)', bodyZh:'寅（紫微、左輔）', bodyEn:'Yin (Zi Wei, Zuo Fu)', daxianZh:'46-50歲（卯宮）', daxianEn:'Age 46-50 (Mao)', annualZh:'丙午年 · 命宮申（武曲、天相）', annualEn:'Bing Wu · Shen (Wu Qu, Tian Xiang)', personalityZh:'天同化權 + 貪狼在命宮午。天生具有親和力與談判手腕，善於交際應酬。貪狼的藝術天賦讓您在美學、設計或娛樂領域有出色表現。天同化權則賦予您化解衝突、凝聚團隊的能力。', personalityEn:'Tian Tong (Authority) + Tan Lang in Life Palace Wu. Natural charisma, artistic talent, excellent negotiator. Tian Tong Authority gives peacemaking and team-building skills.' },
+  '1989-7-20-21-female': { labelZh:'己巳年六月十八 亥時 · 女', labelEn:'Ji Si Yr, 6th Mo, 18th Day, Hai Hour · Female', lunarZh:'己巳年 六月十八', lunarEn:'Ji Si, 6th Mo, 18th Day', pillarsZh:'己巳 辛未 丁酉 辛亥', pillarsEn:'Ji Si Xin Wei Ding You Xin Hai', bureauZh:'木三局（納音大林木）', bureauEn:'Wood-3 Bureau (Forest Wood)', lifeZh:'巳（太陽、天梁、祿存、天魁）', lifeEn:'Si (Tai Yang, Tian Liang, Lu Cun, Tian Kui)', bodyZh:'丑（紫微、破軍）', bodyEn:'Chou (Zi Wei, Po Jun)', daxianZh:'31-40歲（巳宮）', daxianEn:'Age 31-40 (Si)', annualZh:'丙午年 · 命宮酉（廉貞、天府）', annualEn:'Bing Wu · You (Lian Zhen, Tian Fu)', personalityZh:'太陽天梁在命宮巳，心地光明，樂於助人。天梁帶貴氣，適合醫療、教育或公益事業。個性正直，有使命感，但需留意過於理想化。', personalityEn:'Tai Yang + Tian Liang in Life Palace Si. Bright-hearted, generous, idealistic. Suited for healthcare, education, or charity. Strong sense of mission.' }
+};
 
-  // Simulate dynamic demo output based on inputs
-  const yearNum = parseInt(y);
-  const hourNum = parseInt(h);
-  const isNewYear = m >= 2 || (m == 1 && d >= 20);
-  const zodiacIndex = isNewYear ? (yearNum % 12) : ((yearNum - 1) % 12);
-  const zodiac = ['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
-  const zodiacEn = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'];
-  const zi = zodiac[zodiacIndex];
-  const ziEn = zodiacEn[zodiacIndex];
-
-  // Map branch index to character
-  const branchIdx = Math.floor(hourNum / 2) % 12;
-  const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const branchesEn = ['Zi','Chou','Yin','Mao','Chen','Si','Wu','Wei','Shen','You','Xu','Hai'];
-
-  // Heavenly stems for year
-  const stemIdx = isNewYear ? ((yearNum - 4) % 10) : ((yearNum - 5) % 10);
-  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const stemsEn = ['Jia','Yi','Bing','Ding','Wu','Ji','Geng','Xin','Ren','Gui'];
-  const yearStem = stems[((stemIdx % 10) + 10) % 10];
-  const yearStemEn = stemsEn[((stemIdx % 10) + 10) % 10];
-
-  // Sample life palace positions (simplified demo mapping)
-  const lifeIdx = (10 - (((yearNum - 1900) * 12 + (m - 1) + d) % 12) + ((branchIdx + 1) % 12)) % 12;
-  const mainStars = [
-    ['紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁','巨門','廟旺'],
-    ['天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁','巨門'],
-    ['太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相','天梁'],
-    ['廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府','天相'],
-    ['天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺','天府'],
-    ['武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍','七殺'],
-    ['太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機','破軍'],
-    ['天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同','天機'],
-    ['巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽','天同'],
-    ['紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲','太陽'],
-    ['天相','紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微','武曲'],
-    ['天同','天相','紫微','巨門','天梁','太陽七殺','武曲天相','天機破軍','廉貞天府','太陰','天同貪狼','紫微']
-  ];
-
-  const bodyPalaces = ['財帛','疾厄','遷移','交友','官祿','田宅','福德','父母','命宮','兄弟','夫妻','子女'];
-  const bodyEn = ['Wealth','Health','Travel','Friends','Career','Property','Fortune','Parents','Life','Siblings','Marriage','Children'];
-  // Simple mapping: body is 4 ahead of life
-  const bodyIdx = (lifeIdx + 4) % 12;
-
-  const life = branches[lifeIdx];
-  const lifeEn = branchesEn[lifeIdx];
-  const body = branches[bodyIdx];
-  const bodyEnName = branchesEn[bodyIdx];
-
-  // Determine stars for life palace
-  const starRow = lifeIdx < mainStars.length ? mainStars[lifeIdx] : mainStars[0];
-  const starCol = (yearNum + h) % starRow.length;
-  const lifeStars = starRow[starCol];
-
-  // Bureau (simplified)
-  const bureauOptions = ['水二局','木三局','金四局','土五局','火六局'];
-  const bureauOptionsEn = ['Water-2','Wood-3','Metal-4','Earth-5','Fire-6'];
-  const bureauIdx = (yearNum + m) % 5;
-
-  // Personality
-  const personalities = [
-    '命宮主星活潑，天生具有領導力和創造力。善於交際，能在團隊中發揮影響力。需留意情緒管理，避免過於急躁。',
-    '天同化權在命宮，親和力強，善於化解衝突。藝術天賦高，在美學或娛樂領域有出色表現。需注意把握機會。',
-    '命宮紫微坐守，氣質沉穩，天生領袖格局。有全局觀和決斷力，適合管理職位。注意不要過於剛愎自用。',
-    '貪狼在命宮，才華洋溢，學習能力強，人脈廣闊。在社交娛樂領域容易有成就。需留意慾望管理。',
-    '天機在命宮，思維敏捷，善於策劃和分析。適合策略規劃、教育或諮詢行業。注意避免想太多而行動不足。'
-  ];
-  const personalitiesEn = [
-    'Active Life Palace stars. Natural leadership and creativity. Good communicator. Watch for impulsive decisions.',
-    'Tian Tong in Life Palace. Great charisma, peacemaker. Artistic talent. Needs to seize opportunities.',
-    'Zi Wei in Life Palace. Calm, authoritative. Born leader with strategic vision. Avoid being stubborn.',
-    'Tan Lang in Life Palace. Talented, fast learner, wide network. Excels in social/creative fields. Manage desires.',
-    'Tian Ji in Life Palace. Sharp mind, excellent planner. Suits strategy, education, or consulting. Avoid overthinking.'
-  ];
-  const pIdx = (yearNum + m + d) % personalities.length;
-
-  // Update results
-  document.getElementById('demoLunar').textContent = yearStem + zi + '年 ' + m + '月' + d + '日';
-  document.getElementById('demoPillars').textContent = yearStem + '巳 甲辰 辛亥 戊戌';
-  document.getElementById('demoBureau').innerHTML = '<span class="zh-only">' + bureauOptions[bureauIdx] + '（納音' + bureauOptions[bureauIdx].substring(0,1) + '）</span><span class="en-only">' + bureauOptionsEn[bureauIdx] + '</span>';
-  document.getElementById('demoLife').innerHTML = '<span class="zh-only">' + life + '（' + lifeStars + '）</span><span class="en-only">' + lifeEn + ' (' + lifeStars + ')</span>';
-  document.getElementById('demoBody').innerHTML = '<span class="zh-only">' + body + '（' + bodyPalaces[bodyIdx] + '）</span><span class="en-only">' + bodyEnName + ' (' + bodyEn[bodyIdx] + ')</span>';
-  const daxianAgeStart = 4 + (lifeIdx * 4); // simplified: each palace roughly 4 years
-  const daxianAgeEnd = daxianAgeStart + 3;
-  document.getElementById('demoDaxian').innerHTML = '<span class="zh-only">' + daxianAgeStart + '-' + daxianAgeEnd + '歲（' + branches[(lifeIdx + 5) % 12] + '宮）</span><span class="en-only">Age ' + daxianAgeStart + '-' + daxianAgeEnd + ' (' + branchesEn[(lifeIdx + 5) % 12] + ')</span>';
-  document.getElementById('demoAnnual').innerHTML = '<span class="zh-only">丙午年 · 命宮' + branches[(lifeIdx + 4) % 12] + '（' + mainStars[(lifeIdx + 4) % 12][starCol] + '）</span><span class="en-only">Bing Wu · ' + branchesEn[(lifeIdx + 4) % 12] + ' (' + mainStars[(lifeIdx + 4) % 12][starCol] + ')</span>';
-  document.getElementById('demoPersonality').innerHTML = '<span class="zh-only">' + personalities[pIdx] + '</span><span class="en-only">' + personalitiesEn[pIdx] + '</span>';
-
+function loadDemoChart(key) {
+  const chart = DEMO_CHARTS[key];
+  if (!chart) return;
+  const lang = document.documentElement.getAttribute('data-lang') || 'zh';
+  const label = lang === 'zh' ? chart.labelZh : chart.labelEn;
+  document.getElementById('demoChartLabel').textContent = label;
+  document.getElementById('demoLunar').innerHTML = '<span class="zh-only">' + chart.lunarZh + '</span><span class="en-only">' + chart.lunarEn + '</span>';
+  document.getElementById('demoPillars').innerHTML = '<span class="zh-only">' + chart.pillarsZh + '</span><span class="en-only">' + chart.pillarsEn + '</span>';
+  document.getElementById('demoBureau').innerHTML = '<span class="zh-only">' + chart.bureauZh + '</span><span class="en-only">' + chart.bureauEn + '</span>';
+  document.getElementById('demoLife').innerHTML = '<span class="zh-only">' + chart.lifeZh + '</span><span class="en-only">' + chart.lifeEn + '</span>';
+  document.getElementById('demoBody').innerHTML = '<span class="zh-only">' + chart.bodyZh + '</span><span class="en-only">' + chart.bodyEn + '</span>';
+  document.getElementById('demoDaxian').innerHTML = '<span class="zh-only">' + chart.daxianZh + '</span><span class="en-only">' + chart.daxianEn + '</span>';
+  document.getElementById('demoAnnual').innerHTML = '<span class="zh-only">' + chart.annualZh + '</span><span class="en-only">' + chart.annualEn + '</span>';
+  document.getElementById('demoPersonality').innerHTML = '<span class="zh-only">' + chart.personalityZh + '</span><span class="en-only">' + chart.personalityEn + '</span>';
   document.getElementById('resultSection').classList.add('visible');
   document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleDemo(e) {
+  e.preventDefault();
+  const y = document.getElementById('demoYear').value.trim();
+  const m = document.getElementById('demoMonth').value.trim();
+  const d = document.getElementById('demoDay').value.trim();
+  const h = document.getElementById('demoHour').value.trim();
+  const gender = document.getElementById('demoGender').value;
+  const key = y + '-' + m + '-' + d + '-' + h + '-' + gender;
+  if (DEMO_CHARTS[key]) {
+    loadDemoChart(key);
+  } else {
+    document.getElementById('demoChartLabel').innerHTML = '<span class="zh-only">⚠️ 使用範例</span><span class="en-only">⚠️ Use Sample</span>';
+    document.getElementById('demoLunar').innerHTML = '<span class="zh-only" style="color:var(--gold);">僅支援兩組範例，請點「填入範例」</span><span class="en-only" style="color:var(--gold);">Only 2 sample charts — click "Load Sample"</span>';
+    document.getElementById('demoPillars').textContent = '';
+    document.getElementById('demoBureau').textContent = '';
+    document.getElementById('demoLife').textContent = '';
+    document.getElementById('demoBody').textContent = '';
+    document.getElementById('demoDaxian').textContent = '';
+    document.getElementById('demoAnnual').textContent = '';
+    document.getElementById('demoPersonality').innerHTML = '<span class="zh-only">安裝 FREE Skill 後任意生辰都能排盤 ➔</span><span class="en-only">Install FREE Skill for any birth chart ➔</span>';
+    document.getElementById('resultSection').classList.add('visible');
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+  }
   return false;
 }
 </script>
