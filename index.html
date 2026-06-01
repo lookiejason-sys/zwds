@@ -127,13 +127,54 @@ header {
   font-size: .72rem;
   display: flex; flex-wrap: wrap; gap: 4px;
 }
+.palace-cell .p-stars .star:hover {
+  background: rgba(139,92,246,.3);
+  cursor: help;
+}
 .palace-cell .p-stars .star {
   background: rgba(139,92,246,.15);
   padding: 2px 6px; border-radius: 4px;
+  border-bottom: 1px dotted transparent;
+  transition: all .15s;
+  position: relative;
+}
+.palace-cell .p-stars .star:hover {
+  background: rgba(139,92,246,.3);
+  cursor: help;
 }
 .palace-cell .p-stars .star.aux {
   background: rgba(245,158,11,.1);
   color: var(--gold-light);
+}
+.palace-cell .p-stars .star.aux:hover {
+  background: rgba(245,158,11,.25);
+  cursor: help;
+}
+.palace-cell .p-stars .star[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: .72rem;
+  white-space: nowrap;
+  max-width: 220px;
+  white-space: normal;
+  line-height: 1.3;
+  box-shadow: 0 4px 12px rgba(0,0,0,.5);
+  z-index: 10;
+  border: 1px solid var(--border);
+}
+.palace-cell .p-stars .star .star-en {
+  display: block;
+  font-size: .6rem;
+  color: var(--text-dim);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 .palace-grid .empty { background: transparent; min-height: auto; }
 
@@ -400,14 +441,52 @@ const SAMPLE = {
 
 const PALACE_EN = { '命宮':'Life','兄弟':'Siblings','夫妻':'Marriage','子女':'Children','財帛':'Wealth','疾厄':'Health','遷移':'Travel','交友':'Friends','官祿':'Career','田宅':'Property','福德':'Fortune','父母':'Parents' };
 
+// Star dictionary: name_en, short_desc_zh, short_desc_en
+const STAR_MAP = {
+  '紫微': { en:'Zi Wei', zh:'領袖格局，帝王之相', enDesc:'Emperor Star — authority, leadership, command' },
+  '天機': { en:'Tian Ji', zh:'智慧謀略，善於分析', enDesc:'Strategist Star — wisdom, intellect, analysis' },
+  '太陽': { en:'Tai Yang', zh:'熱情慷慨，光明磊落', enDesc:'Sun Star — vitality, generosity, fame' },
+  '武曲': { en:'Wu Qu', zh:'財星將星，果斷務實', enDesc:'Warrior Star — discipline, wealth, decisiveness' },
+  '天同': { en:'Tian Tong', zh:'福氣之星，溫和協調', enDesc:'Harmony Star — peace, cooperation, adaptability' },
+  '廉貞': { en:'Lian Zhen', zh:'善惡分明，原則底線', enDesc:'Integrity Star — depth, principle, transformation' },
+  '天府': { en:'Tian Fu', zh:'庫藏之星，穩定包容', enDesc:'Minister Star — stability, nurture, preservation' },
+  '太陰': { en:'Tai Yin', zh:'溫柔內斂，藝術直覺', enDesc:'Moon Star — intuition, emotion, beauty' },
+  '貪狼': { en:'Tan Lang', zh:'桃花才藝，社交靈活', enDesc:'Desire Star — versatility, charm, social mastery' },
+  '巨門': { en:'Ju Men', zh:'能言善辯，易惹是非', enDesc:'Gatekeeper Star — communication, debate, conflict' },
+  '天相': { en:'Tian Xiang', zh:'公正之星，溫和正直', enDesc:'Justice Star — balance, fairness, integrity' },
+  '天梁': { en:'Tian Liang', zh:'長者貴氣，醫療教育', enDesc:'Wisdom Star — healing, mentorship, protection' },
+  '七殺': { en:'Qi Sha', zh:'果敢剛毅，敢衝敢拚', enDesc:'Executioner Star — boldness, action, upheaval' },
+  '破軍': { en:'Po Jun', zh:'破壞重建，變革動盪', enDesc:'Destroyer Star — disruption, revolution, rebuilding' },
+  '文昌': { en:'Wen Chang', zh:'文書考試，學術成就', enDesc:'Literary Star — exams, scholarship, writing' },
+  '文曲': { en:'Wen Qu', zh:'藝術口才，創意表達', enDesc:'Arts Star — eloquence, creativity, expression' },
+  '左輔': { en:'Zuo Fu', zh:'男性貴人，實際幫助', enDesc:'Left Assistant — male benefactor, practical help' },
+  '右弼': { en:'You Bi', zh:'女性貴人，暗中支持', enDesc:'Right Assistant — female benefactor, support' },
+  '天魁': { en:'Tian Kui', zh:'天降貴人，錦上添花', enDesc:'Noble Star — heaven-sent helper, timely luck' },
+  '天鉞': { en:'Tian Yue', zh:'暗中助力，貴人相助', enDesc:'Secret Helper — unexpected aid, hidden support' },
+  '祿存': { en:'Lu Cun', zh:'財富積累，穩步增長', enDesc:'Prosperity Star — wealth accumulation, abundance' },
+  '擎羊': { en:'Qing Yang', zh:'衝突競爭，突發挑戰', enDesc:'Clash Star — conflict, competition, challenges' },
+  '陀羅': { en:'Tuo Luo', zh:'拖延業力，反覆磨練', enDesc:'Karmic Delay — delay, karma, repeated lessons' },
+  '火星': { en:'Huo Xing', zh:'衝動爆發，快速行動', enDesc:'Fire Star — impulse, explosive energy, action' },
+  '鈴星': { en:'Ling Xing', zh:'突發破壞，意外麻煩', enDesc:'Bell Star — sudden disruption, unexpected trouble' },
+  '天馬': { en:'Tian Ma', zh:'驛馬星動，遠行變動', enDesc:'Heavenly Horse — travel, movement, change' }
+};
+
+function starHtml(s, cls) {
+  const info = STAR_MAP[s] || { en: s, zh: '', enDesc: '' };
+  const tip = `<span class="zh-only">${info.zh}</span><span class="en-only">${info.enDesc}</span>`;
+  const enName = `<span class="star-en en-only">${info.en}</span>`;
+  const zhName = `<span class="zh-only">${s}</span>`;
+  return `<span class="star ${cls||''}" data-tip="${tip.replace(/"/g,'&quot;')}">${zhName}${enName}</span>`;
+}
+
 function renderSample() {
   const grid = document.getElementById('samplePalaceGrid');
   const lang = document.documentElement.getAttribute('data-lang') || 'zh';
   grid.innerHTML = SAMPLE.palaces.map(p => {
     if (!p[0]) return '<div class="empty"></div>';
     const name = lang === 'zh' ? p[0] : PALACE_EN[p[0]] || p[0];
-    const main = p[2] ? p[2].split(',').map(s => `<span class="star">${s}</span>`).join('') : '';
-    const aux = p[3] ? p[3].split(',').filter(Boolean).map(s => `<span class="star aux">${s}</span>`).join('') : '';
+    const main = p[2] ? p[2].split(',').map(s => starHtml(s.trim(), '')).join('') : '';
+    const aux = p[3] ? p[3].split(',').filter(Boolean).map(s => starHtml(s.trim(), 'aux')).join('') : '';
     return `<div class="palace-cell"><div class="p-name">${name}</div><div class="p-zhi">${p[1]}</div><div class="p-stars">${main}${aux}</div></div>`;
   }).join('');
 }
