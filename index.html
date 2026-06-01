@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紫微斗數命理大師 | Zi Wei Dou Shu Master</title>
+<meta name="description" content="輸入出生資訊，馬上獲得紫微斗數命盤與性格解析。免費基礎版 + 付費完整版。Get your FREE Zi Wei Dou Shu birth chart via OpenClaw.">
+<style>
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0e1a;
+  --card: #111827;
+  --card-hover: #1a2332;
+  --accent: #8b5cf6;
+  --accent-light: #a78bfa;
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --border: #1e293b;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+a { color: var(--accent-light); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header {
+  padding: 16px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,14,26,.85);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-size: 1.2rem; font-weight: 700; color: var(--gold); letter-spacing: .5px; }
+.logo span { color: var(--text-dim); font-weight: 400; font-size: .85rem; margin-left: 8px; }
+.lang-toggle {
+  display: flex; gap: 4px;
+  background: var(--card); border-radius: var(--radius-sm); padding: 3px;
+}
+.lang-btn {
+  padding: 6px 14px; border: none; border-radius: 6px;
+  font-size: .85rem; cursor: pointer;
+  background: transparent; color: var(--text-dim); transition: all .2s;
+}
+.lang-btn.active { background: var(--accent); color: #fff; }
+
+.hero {
+  text-align: center; padding: 80px 24px 50px;
+  background: linear-gradient(180deg, rgba(139,92,246,.08) 0%, transparent 100%);
+}
+.hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; }
+.hero h1 em { font-style: normal; color: var(--gold); }
+.hero p { color: var(--text-dim); max-width: 560px; margin: 0 auto; font-size: 1.05rem; }
+.hero .badge {
+  display: inline-block; margin-top: 20px;
+  padding: 8px 20px; border-radius: 20px;
+  background: rgba(139,92,246,.15); color: var(--accent-light);
+  font-size: .85rem; font-weight: 500;
+}
+
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+.sample-section { padding: 40px 0; }
+.section-title {
+  font-size: 1.4rem; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title .tag {
+  font-size: .75rem; padding: 2px 10px; border-radius: 20px;
+  background: var(--accent); color: #fff; font-weight: 600;
+}
+.sample-chart {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.sample-chart .chart-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sample-chart .chart-header h3 { font-size: 1rem; }
+.sample-chart .chart-body { padding: 20px; }
+
+.palace-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.palace-cell {
+  background: var(--card);
+  padding: 12px;
+  min-height: 120px;
+  position: relative;
+}
+.palace-cell .p-name {
+  font-size: .75rem; color: var(--accent); font-weight: 600;
+  margin-bottom: 6px; letter-spacing: 1px;
+}
+.palace-cell .p-zhi {
+  font-size: .65rem; color: var(--text-dim);
+  position: absolute; top: 12px; right: 12px;
+}
+.palace-cell .p-stars {
+  font-size: .72rem;
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.palace-cell .p-stars .star {
+  background: rgba(139,92,246,.15);
+  padding: 2px 6px; border-radius: 4px;
+}
+.palace-cell .p-stars .star.aux {
+  background: rgba(245,158,11,.1);
+  color: var(--gold-light);
+}
+.palace-grid .empty { background: transparent; min-height: auto; }
+
+.personality { margin-top: 20px; }
+.personality h4 { color: var(--gold); font-size: .9rem; margin-bottom: 8px; }
+.personality p { color: var(--text-dim); font-size: .95rem; line-height: 1.7; }
+
+.form-section { padding: 40px 0; }
+.form-section .note { color: var(--text-dim); font-size: .85rem; margin-bottom: 20px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: .85rem; color: var(--text-dim); }
+.form-group input, .form-group select {
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card); color: var(--text);
+  font-size: .95rem; outline: none; transition: border .2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group input::placeholder { color: #4a5568; }
+.btn {
+  padding: 12px 28px; border: none; border-radius: var(--radius-sm);
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(139,92,246,.3); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  color: #000;
+}
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245,158,11,.3); }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent-light); }
+
+.result-section { display: none; padding: 40px 0; }
+.result-section.visible { display: block; }
+.result-card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 24px;
+  margin-bottom: 20px;
+}
+.result-card h3 { font-size: 1rem; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.result-item { display: flex; flex-direction: column; gap: 2px; }
+.result-item .label { font-size: .75rem; color: var(--text-dim); }
+.result-item .value { font-size: .95rem; font-weight: 500; }
+.result-item .value .accent { color: var(--accent); }
+.result-item .value .gold { color: var(--gold); }
+
+.cta-section { padding: 40px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cta-card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 28px 24px;
+  text-align: center;
+}
+.cta-card:hover { border-color: rgba(139,92,246,.3); }
+.cta-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.cta-card p { color: var(--text-dim); font-size: .9rem; margin-bottom: 16px; }
+.cta-card .price { font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-bottom: 8px; }
+
+footer {
+  text-align: center; padding: 30px 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: .8rem;
+}
+
+@media (max-width: 640px) {
+  .hero h1 { font-size: 1.8rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr; }
+  .palace-grid { grid-template-columns: repeat(3, 1fr); }
+  .sample-chart .chart-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .cta-section { grid-template-columns: 1fr; }
+}
+
+[data-lang="zh"] .en-only { display: none; }
+[data-lang="en"] .zh-only { display: none; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">✦ 紫微斗數 <span>ZWDS Master</span></div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="switchLang('zh')" data-lang="zh">中文</button>
+    <button class="lang-btn" onclick="switchLang('en')" data-lang="en">EN</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1 class="zh-only">✦ 紫微斗數命理大師</h1>
+  <h1 class="en-only">✦ Zi Wei Dou Shu <em>Master</em></h1>
+  <p class="zh-only">千年智慧 × AI 科技。輸入出生資訊，即可獲得命盤與性格解析。</p>
+  <p class="en-only">Ancient wisdom meets AI. Enter your birth info for your FREE ZWDS chart.</p>
+  <div class="badge">
+    <span class="zh-only">🔮 免費 · 僅供參考 · 自我反思</span>
+    <span class="en-only">🔮 Free · For entertainment &amp; self-reflection</span>
+  </div>
+</section>
+
+<!-- Sample Chart -->
+<section class="sample-section container">
+  <div class="section-title">
+    <span class="zh-only">📖 範例命盤</span>
+    <span class="en-only">📖 Sample Chart</span>
+    <span class="tag">FREE</span>
+  </div>
+  <div class="sample-chart" id="sampleChart">
+    <div class="chart-header">
+      <h3>
+        <span class="zh-only">丁巳年三月初一 戌時 · 男</span>
+        <span class="en-only">Ding Si Yr, 3rd Mo, 1st Day, Xu Hour · Male</span>
+      </h3>
+      <span style="color:var(--text-dim);font-size:.8rem;">
+        <span class="zh-only">八字：丁巳 甲辰 辛亥 戊戌</span>
+        <span class="en-only">Pillars: Ding Si Jia Chen Xin Hai Wu Xu</span>
+      </span>
+    </div>
+    <div class="chart-body">
+      <div class="palace-grid" id="samplePalaceGrid"></div>
+      <div class="personality">
+        <h4 class="zh-only">🔮 性格特質</h4>
+        <h4 class="en-only">🔮 Personality</h4>
+        <p class="zh-only">天同化權 + 貪狼在命宮午。天生具有親和力與談判手腕，善於交際應酬。貪狼的藝術天賦讓您在美學、設計或娛樂領域有出色表現。天同化權則賦予您化解衝突、凝聚團隊的能力。</p>
+        <p class="en-only">Tian Tong (Authority) + Tan Lang in Life Palace Wu. Natural charisma, artistic talent, excellent negotiator. Tian Tong Authority gives peacemaking and team-building skills.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Form -->
+<section class="form-section container">
+  <div class="section-title">
+    <span class="zh-only">🔮 試算命盤</span>
+    <span class="en-only">🔮 Try It</span>
+    <span class="tag">DEMO</span>
+  </div>
+  <p class="note zh-only">輸入出生資訊查看示範結果。安裝免費 Skill 即可隨時排盤，或升級 PREMIUM 獲得完整深度解盤。</p>
+  <p class="note en-only">Enter birth info to see a demo. Install the FREE Skill for instant charts, or unlock PREMIUM for full analysis.</p>
+
+  <form id="chartForm" onsubmit="return handleDemo(event)">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="demoYear"><span class="zh-only">出生年份</span><span class="en-only">Year</span></label>
+        <input type="number" id="demoYear" value="1977" min="1900" max="2100">
+      </div>
+      <div class="form-group">
+        <label for="demoMonth"><span class="zh-only">月份</span><span class="en-only">Month</span></label>
+        <input type="number" id="demoMonth" value="4" min="1" max="12">
+      </div>
+      <div class="form-group">
+        <label for="demoDay"><span class="zh-only">日期</span><span class="en-only">Day</span></label>
+        <input type="number" id="demoDay" value="18" min="1" max="31">
+      </div>
+      <div class="form-group">
+        <label for="demoHour"><span class="zh-only">時辰 (24h)</span><span class="en-only">Hour (24h)</span></label>
+        <input type="number" id="demoHour" value="19" min="0" max="23">
+      </div>
+      <div class="form-group">
+        <label for="demoMinute"><span class="zh-only">分鐘</span><span class="en-only">Minute</span></label>
+        <input type="number" id="demoMinute" value="30" min="0" max="59">
+      </div>
+      <div class="form-group">
+        <label><span class="zh-only">性別</span><span class="en-only">Gender</span></label>
+        <select id="demoGender">
+          <option value="male" selected><span class="zh-only">男</span><span class="en-only">Male</span></option>
+          <option value="female"><span class="zh-only">女</span><span class="en-only">Female</span></option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <button type="submit" class="btn btn-primary">
+          <span class="zh-only">✦ 查看命盤</span>
+          <span class="en-only">✦ View Chart</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- Demo Result -->
+<section class="result-section container" id="resultSection">
+  <div class="result-card">
+    <h3 class="zh-only">📋 命盤資訊（示範結果）</h3>
+    <h3 class="en-only">📋 Chart Info (Demo)</h3>
+    <div class="result-grid">
+      <div class="result-item"><span class="label"><span class="zh-only">農曆</span><span class="en-only">Lunar</span></span><span class="value">丁巳年 三月初一</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">八字</span><span class="en-only">Pillars</span></span><span class="value accent">丁巳 甲辰 辛亥 戊戌</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">五行局</span><span class="en-only">Bureau</span></span><span class="value gold"><span class="zh-only">土五局（納音沙中土）</span><span class="en-only">Earth-5</span></span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">命宮</span><span class="en-only">Life</span></span><span class="value">午（天同、貪狼、祿存、文曲）</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">身宮</span><span class="en-only">Body</span></span><span class="value">寅（紫微、左輔）</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">大限</span><span class="en-only">Da Xian</span></span><span class="value">46-50<span class="zh-only">歲</span><span class="en-only">yr</span>（<span class="zh-only">卯宮</span><span class="en-only">Mao</span>）</span></div>
+      <div class="result-item"><span class="label"><span class="zh-only">流年</span><span class="en-only">Annual</span></span><span class="value">丙午<span class="zh-only">年 · 命宮申（武曲、天相）</span><span class="en-only"> · Life Palace Shen</span></span></div>
+    </div>
+  </div>
+  <div class="result-card">
+    <h3 class="zh-only">🔮 性格簡評</h3>
+    <h3 class="en-only">🔮 Personality</h3>
+    <p style="color:var(--text-dim);line-height:1.8;" class="zh-only">命宮在午宮，主星：天同、貪狼。天同化權 + 貪狼，天生親和力強，善於交際應酬。藝術天賦高，在美學或娛樂領域有出色表現。能化解衝突、凝聚團隊。但需留意慾望控制。</p>
+    <p style="color:var(--text-dim);line-height:1.8;" class="en-only">Life Palace in Wu. Main stars: Tian Tong, Tan Lang. Natural charisma, artistic talent, excellent negotiator. Watch for scattered focus.</p>
+  </div>
+
+  <div class="cta-section">
+    <div class="cta-card">
+      <h3 class="zh-only">⚡ 免費排盤</h3>
+      <h3 class="en-only">⚡ FREE Skill</h3>
+      <p class="zh-only">安裝 ClawHub Skill，隨時透過 AI 命理師排盤，即時解析。</p>
+      <p class="en-only">Install the ClawHub Skill. Chat with the master anytime for instant chart calculation.</p>
+      <a href="https://clawhub.ai/skills/zwds-master" class="btn btn-primary" target="_blank">
+        <span class="zh-only">✦ 安裝 Skill</span>
+        <span class="en-only">✦ Install Skill</span>
+      </a>
+    </div>
+    <div class="cta-card">
+      <h3 class="zh-only">👑 完整解盤</h3>
+      <h3 class="en-only">👑 PREMIUM</h3>
+      <div class="price">$9.99 USD</div>
+      <p class="zh-only">解鎖12宮深度解讀 + 流年月批 + 三世書 + PDF報告</p>
+      <p class="en-only">Full 12-palace analysis + Annual predictions + Past-life + PDF</p>
+      <a href="" class="btn btn-gold" target="_blank">
+        <span class="zh-only">✦ 前往解鎖</span>
+        <span class="en-only">✦ Unlock Now</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="zh-only">紫微斗數命理解讀僅供參考與自我反思之用。© 2026 紫微斗數命理大師</p>
+  <p class="en-only">ZWDS readings are for entertainment and self-reflection only. © 2026 ZWDS Master</p>
+</footer>
+
+<script>
+function switchLang(lang) {
+  document.documentElement.setAttribute('data-lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('select option').forEach(o => {
+    if (o.value === 'male') o.textContent = lang === 'zh' ? '男' : 'Male';
+    if (o.value === 'female') o.textContent = lang === 'zh' ? '女' : 'Female';
+  });
+}
+
+const SAMPLE = {
+  palaces: [
+    ['兄弟','巳','太陰','陀羅'],  ['命宮','午','天同貪狼','祿存文曲'],
+    ['父母','未','巨門','擎羊'],  ['福德','申','武曲天相','文昌'],
+    ['夫妻','辰','廉貞天府',''],  ['','','',''],    ['','','',''],        ['田宅','酉','天梁','天鉞'],
+    ['子女','卯','','火星'],      ['','','',''],    ['','','',''],        ['官祿','戌','太陽七殺',''],
+    ['財帛','寅','紫微','左輔'],  ['疾厄','丑','',''], ['遷移','子','天機破軍','右弼'], ['交友','亥','','天魁']
+  ]
+};
+
+const PALACE_EN = { '命宮':'Life','兄弟':'Siblings','夫妻':'Marriage','子女':'Children','財帛':'Wealth','疾厄':'Health','遷移':'Travel','交友':'Friends','官祿':'Career','田宅':'Property','福德':'Fortune','父母':'Parents' };
+
+function renderSample() {
+  const grid = document.getElementById('samplePalaceGrid');
+  const lang = document.documentElement.getAttribute('data-lang') || 'zh';
+  grid.innerHTML = SAMPLE.palaces.map(p => {
+    if (!p[0]) return '<div class="empty"></div>';
+    const name = lang === 'zh' ? p[0] : PALACE_EN[p[0]] || p[0];
+    const main = p[2] ? p[2].split(',').map(s => `<span class="star">${s}</span>`).join('') : '';
+    const aux = p[3] ? p[3].split(',').filter(Boolean).map(s => `<span class="star aux">${s}</span>`).join('') : '';
+    return `<div class="palace-cell"><div class="p-name">${name}</div><div class="p-zhi">${p[1]}</div><div class="p-stars">${main}${aux}</div></div>`;
+  }).join('');
+}
+
+renderSample();
+
+const origSwitch = switchLang;
+switchLang = function(l) { origSwitch(l); renderSample(); };
+
+function handleDemo(e) {
+  e.preventDefault();
+  document.getElementById('resultSection').classList.add('visible');
+  document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+  return false;
+}
+</script>
+</body>
+</html>
